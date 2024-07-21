@@ -15,7 +15,7 @@ class SearchView extends SearchDelegate {
               'Clear',
               style: Theme.of(context)
                   .textTheme
-                  .subtitle1!
+                  .titleMedium!
                   .copyWith(color: Colors.grey),
             ))),
       )
@@ -35,9 +35,9 @@ class SearchView extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     if (query.length < 3) {
-      return Column(
+      return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const <Widget>[
+        children: <Widget>[
           Padding(
             padding: EdgeInsets.all(24.0),
             child: Center(
@@ -49,11 +49,11 @@ class SearchView extends SearchDelegate {
         ],
       );
     }
-    return Column();
+    return const Column();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Column();
+    return const Column();
   }
 }

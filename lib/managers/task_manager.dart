@@ -22,7 +22,6 @@ class TaskManager with ChangeNotifier {
   bool get isLoading => _isLoading;
   List<Data> get assignees => _assignees;
 
-
   setMessage(String? message) {
     _message = message;
     notifyListeners();
@@ -37,7 +36,6 @@ class TaskManager with ChangeNotifier {
     _assignees = users;
     notifyListeners();
   }
-
 
   Future<bool> createTask(
       {required String description,
@@ -82,44 +80,49 @@ class TaskManager with ChangeNotifier {
   }
 
   Future<Task?> getTasks() async {
-    Task? task;
+    Task? tasks;
     int? organizationId = await _localStorage.getOrganizationId();
+    if (organizationId == null) {
+      return null;
+    }
     await _taskService.getTaskRequest(organizationId).then((response) {
       int statusCode = response.statusCode;
       Map<String, dynamic> body = json.decode(response.body);
-      setMessage(body['message']);
       setisLoading(false);
       if (statusCode == 200) {
-        task = Task.fromMap(body);
+        tasks = Task.fromMap(body);
       } else {
-        task = null;
+        setMessage(body['message']);
+
+        tasks = null;
       }
     }).catchError((onError) {
-      task = null;
       _logger.d('$onError');
       setMessage('$onError');
       setisLoading(false);
+      tasks = null;
     }).timeout(const Duration(seconds: 60), onTimeout: () {
       setMessage('Timeout! Check your internet connection.');
       setisLoading(false);
-      task = null;
+      tasks = null;
     });
-    return task;
+    return tasks;
   }
 
   Future<TaskStatistic?> getTaskStatistics() async {
     TaskStatistic? taskStatistic;
     int? userId = await _localStorage.getId();
-    await _taskService.getTaskStatisticsRequest(userId).then((response) {
+    await _taskService.getTaskStatisticsRequest(userId!).then((response) {
       int statusCode = response.statusCode;
       Map<String, dynamic> body = json.decode(response.body);
-      setMessage(body['message']);
       _logger.d(body['message']);
       setisLoading(false);
       _logger.d(body['message']);
       if (statusCode == 200) {
         taskStatistic = TaskStatistic.fromMap(body);
       } else {
+        setMessage(body['message']);
+
         taskStatistic = null;
       }
     }).catchError((onError) {
@@ -135,7 +138,8 @@ class TaskManager with ChangeNotifier {
     return taskStatistic;
   }
 
-  Future<bool> markTaskAsCompleted({int? taskId, String? status}) async {
+  Future<bool> markTaskAsCompleted(
+      {required int taskId, required String status}) async {
     bool isDone = false;
     await _taskService
         .markAsCompletedRequest(status: status, taskId: taskId)

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tasky_mobile_app/utils/ui_utils/custom_colors.dart';
 import 'package:tasky_mobile_app/models/user.dart';
-
+import 'package:tasky_mobile_app/utils/ui_utils/custom_colors.dart';
 
 class AssigneeTileWidget extends StatelessWidget {
   const AssigneeTileWidget(
-      {Key? key, required this.onTap, required this.selectedUser, required this.isChecked})
-      : super(key: key);
+      {super.key, required this.onTap, required this.selectedUser, required this.isChecked});
   final bool isChecked;
   final Data selectedUser;
   final Function onTap;
@@ -16,11 +14,13 @@ class AssigneeTileWidget extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         radius: 20,
-        backgroundImage: NetworkImage(selectedUser.picture!),
+        backgroundImage: (selectedUser.picture == null
+            ? const ExactAssetImage('assets/avatar.png')
+            : NetworkImage(selectedUser.picture!) as ImageProvider),
       ),
       title: Text(
-        selectedUser.name!,
-        style: Theme.of(context).textTheme.bodyText1,
+        selectedUser.name ?? 'Not provided',
+        style: Theme.of(context).textTheme.bodyLarge,
       ),
       trailing: GestureDetector(
         onTap: () {

@@ -10,12 +10,18 @@ import 'package:tasky_mobile_app/models/user.dart';
 import 'package:tasky_mobile_app/utils/local_storage.dart';
 import 'package:tasky_mobile_app/utils/ui_utils/ui_utils.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   final UiUtilities uiUtilities = UiUtilities();
   final AuthManager _authManager = GetIt.I.get<AuthManager>();
   final LocalStorage _localStorage = GetIt.I.get<LocalStorage>();
 
-  LoginView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,13 +44,17 @@ class LoginView extends StatelessWidget {
             Center(
                 child: Text(
               'Tasky',
-              style: Theme.of(context).textTheme.headline4!.copyWith(
-                  fontWeight: FontWeight.bold, fontFamily: GoogleFonts.fugazOne().fontFamily),
+              style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: GoogleFonts.fugazOne().fontFamily),
             )),
             const Spacer(),
             Text(
               'Login or Create a new account',
-              style: Theme.of(context).textTheme.bodyText2!.copyWith(color: Colors.grey),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Colors.grey),
             ),
             const SizedBox(
               height: 15,
@@ -71,7 +81,10 @@ class LoginView extends StatelessWidget {
                     ),
                     Text(
                       'Continue with Google',
-                      style: Theme.of(context).textTheme.button!.copyWith(color: Colors.black),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(color: Colors.black),
                     ),
                   ],
                 ),
@@ -85,16 +98,24 @@ class LoginView extends StatelessWidget {
                 BotToast.closeAllLoading();
                 if (isSuccess) {
                   Data data = await _localStorage.getUserInfo();
-                  uiUtilities.actionAlertWidget(context: context, alertType: 'success');
-                  uiUtilities.alertNotification(context: context, message: _authManager.message!);
+                  if (!context.mounted) return;
+
+                  uiUtilities.actionAlertWidget(
+                      context: context, alertType: AlertType.success);
+                  uiUtilities.alertNotification(
+                      context: context, message: _authManager.message!);
 
                   Future.delayed(const Duration(seconds: 3), () {
                     Navigator.pushNamedAndRemoveUntil(context,
                         data.organizationId == null ? '/organizationView' : '/', (route) => false);
                   });
                 } else {
-                  uiUtilities.actionAlertWidget(context: context, alertType: 'error');
-                  uiUtilities.alertNotification(context: context, message: _authManager.message!);
+                  if (!context.mounted) return;
+
+                  uiUtilities.actionAlertWidget(
+                      context: context, alertType: AlertType.error);
+                  uiUtilities.alertNotification(
+                      context: context, message: _authManager.message!);
                 }
               },
             ),
@@ -123,7 +144,10 @@ class LoginView extends StatelessWidget {
                       ),
                       Text(
                         'Sign in with Apple',
-                        style: Theme.of(context).textTheme.button!.copyWith(color: Colors.white),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge!
+                            .copyWith(color: Colors.white),
                       ),
                     ],
                   ),
@@ -140,7 +164,10 @@ class LoginView extends StatelessWidget {
                     BotToast.closeAllLoading();
                     if (isSuccess) {
                       Data data = await _localStorage.getUserInfo();
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'success');
+                      if (!context.mounted) return;
+
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.success);
                       uiUtilities.alertNotification(
                           context: context, message: _authManager.message!);
 
@@ -151,14 +178,19 @@ class LoginView extends StatelessWidget {
                             (route) => false);
                       });
                     } else {
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'error');
+                      if (!context.mounted) return;
+
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.error);
                       uiUtilities.alertNotification(
                           context: context, message: _authManager.message!);
                     }
                   } catch (e) {
                     BotToast.closeAllLoading();
-                    uiUtilities.actionAlertWidget(context: context, alertType: 'error');
-                    uiUtilities.alertNotification(context: context, message: _authManager.message!);
+                    uiUtilities.actionAlertWidget(
+                        context: context, alertType: AlertType.error);
+                    uiUtilities.alertNotification(
+                        context: context, message: _authManager.message!);
                     debugPrint('$e');
                   }
                 },

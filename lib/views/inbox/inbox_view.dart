@@ -8,15 +8,16 @@ import 'package:get_it/get_it.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:readmore/readmore.dart';
 import 'package:tasky_mobile_app/managers/inbox_manager.dart';
+import 'package:tasky_mobile_app/models/comment.dart' as comment;
 import 'package:tasky_mobile_app/models/inbox.dart';
 import 'package:tasky_mobile_app/shared_widgets/empty_widget.dart';
 import 'package:tasky_mobile_app/utils/ui_utils/custom_colors.dart';
+import 'package:tasky_mobile_app/utils/ui_utils/extentions.dart';
 import 'package:tasky_mobile_app/utils/ui_utils/ui_utils.dart';
 import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
-import 'package:tasky_mobile_app/models/comment.dart' as comment;
 
 class InboxView extends StatefulWidget {
-  const InboxView({Key? key}) : super(key: key);
+  const InboxView({super.key});
 
   @override
   State<InboxView> createState() => _InboxViewState();
@@ -42,7 +43,7 @@ class _InboxViewState extends State<InboxView> {
           'Inbox',
           style: Theme.of(context)
               .textTheme
-              .headline6!
+              .titleLarge!
               .copyWith(fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
@@ -79,7 +80,7 @@ class _InboxViewState extends State<InboxView> {
                                       options[index],
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyText1!
+                                          .bodyLarge!
                                           .copyWith(
                                               color: currentIndex == index
                                                   ? customRedColor
@@ -120,14 +121,13 @@ class _InboxViewState extends State<InboxView> {
               );
             }
 
-               if (snapshot.connectionState == ConnectionState.done &&
+            if (snapshot.connectionState == ConnectionState.done &&
                 snapshot.data!.data!.isEmpty) {
               return const EmptyWidget(
                 message: 'You don\'t have any message yet.',
                 imageAsset: 'no_inbox.png',
               );
             }
-
 
             return ListView.separated(
                 shrinkWrap: true,
@@ -155,7 +155,7 @@ class _InboxViewState extends State<InboxView> {
                       teamName: snapshot.data!.data![index].team,
                       title: snapshot.data!.data![index].title,
                       timestamp: time_ago
-                          .format(snapshot.data!.data![index].createdAt!),
+                          .format(snapshot.data!.data![index].updatedAt!),
                       dueDate: snapshot.data!.data![index].status!,
                       replies: snapshot.data!.data![index].like == null
                           ? 0
@@ -171,26 +171,36 @@ class _InboxViewState extends State<InboxView> {
           MaterialCommunityIcons.chat_outline,
           color: Colors.white,
         ),
-        onPressed: () => Navigator.of(context).pushNamed('/createInboxView'),
+        onPressed: () async {
+          final res = await Navigator.of(context).pushNamed('/createInboxView');
+          if (res != null) {
+            setState(() {});
+          }
+        },
       ),
     );
   }
 }
 
-class MessageDisplayWidget extends StatelessWidget {
-  MessageDisplayWidget({
-    Key? key,
+class MessageDisplayWidget extends StatefulWidget {
+  const MessageDisplayWidget({
+    super.key,
     required FirebaseAuth firebaseAuth,
     required this.snapshot,
     required this.inboxManager,
-  })  : _firebaseAuth = firebaseAuth,
-        super(key: key);
+  })  : _firebaseAuth = firebaseAuth;
 
   final FirebaseAuth _firebaseAuth;
   final Datum snapshot;
   final InboxManager inboxManager;
 
+  @override
+  State<MessageDisplayWidget> createState() => _MessageDisplayWidgetState();
+}
+
+class _MessageDisplayWidgetState extends State<MessageDisplayWidget> {
   final TextEditingController _commentController = TextEditingController();
+
   final UiUtilities uiUtilities = UiUtilities();
 
   @override
@@ -214,15 +224,15 @@ class MessageDisplayWidget extends StatelessWidget {
                     width: 8,
                   ),
                   Text(
-                    snapshot.team!,
-                    style: Theme.of(context).textTheme.bodyText1,
+                    widget.snapshot.team!,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
               ),
               Text(
-                snapshot.status!,
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                    color: snapshot.status! == 'Completed'
+                widget.snapshot.status!,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: widget.snapshot.status! == 'Completed'
                         ? Colors.green
                         : customGreyColor),
               ),
@@ -242,17 +252,17 @@ class MessageDisplayWidget extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(45),
                         side: BorderSide(
-                            color: snapshot.status! == 'Completed'
+                            color: widget.snapshot.status! == 'Completed'
                                 ? Colors.transparent
                                 : customGreyColor)),
                     child: CircleAvatar(
                       radius: 12,
-                      backgroundColor: snapshot.status! == 'Completed'
+                      backgroundColor: widget.snapshot.status! == 'Completed'
                           ? Colors.green
                           : Colors.transparent,
                       child: Icon(
                         Icons.check,
-                        color: snapshot.status! == 'Completed'
+                        color: widget.snapshot.status! == 'Completed'
                             ? Colors.white
                             : customGreyColor,
                         size: 18,
@@ -263,17 +273,17 @@ class MessageDisplayWidget extends StatelessWidget {
                     width: 10,
                   ),
                   Text(
-                    snapshot.title!,
+                    widget.snapshot.title!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyLarge!
                         .copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
-              snapshot.like == null
+              widget.snapshot.like == null
                   ? const SizedBox.shrink()
                   : Material(
                       color: customRedColor,
@@ -283,10 +293,10 @@ class MessageDisplayWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             Text(
-                              '${snapshot.like == null ? 0 : snapshot.like!.length}',
+                              '${widget.snapshot.like == null ? 0 : widget.snapshot.like!.length}',
                               style: Theme.of(context)
                                   .textTheme
-                                  .subtitle2!
+                                  .titleSmall!
                                   .copyWith(
                                       fontWeight: FontWeight.normal,
                                       color: Colors.white),
@@ -317,9 +327,10 @@ class MessageDisplayWidget extends StatelessWidget {
                     .primaries[Random().nextInt(Colors.primaries.length)]
                     .withOpacity(.2),
                 radius: 30,
-                backgroundImage: (snapshot.user!.picture!.isEmpty
-                    ? const ExactAssetImage('assets/avatar.png')
-                    : NetworkImage(snapshot.user!.picture!)) as ImageProvider,
+                backgroundImage: (widget.snapshot.user!.picture!.isEmpty
+                        ? const ExactAssetImage('assets/avatar.png')
+                        : NetworkImage(widget.snapshot.user!.picture!))
+                    as ImageProvider,
               ),
               const SizedBox(
                 width: 10,
@@ -330,12 +341,12 @@ class MessageDisplayWidget extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 120,
                     child: ReadMoreText(
-                      snapshot.message!,
+                      widget.snapshot.message!,
                       trimLines: 5,
                       colorClickableText: customRedColor,
                       lessStyle: Theme.of(context)
                           .textTheme
-                          .bodyText1!
+                          .bodyLarge!
                           .copyWith(
                               fontWeight: FontWeight.w600,
                               color: customRedColor),
@@ -344,11 +355,11 @@ class MessageDisplayWidget extends StatelessWidget {
                       trimExpandedText: 'Show less',
                       style: Theme.of(context)
                           .textTheme
-                          .bodyText1!
+                          .bodyLarge!
                           .copyWith(fontWeight: FontWeight.normal),
                       moreStyle: Theme.of(context)
                           .textTheme
-                          .bodyText1!
+                          .bodyLarge!
                           .copyWith(
                               fontWeight: FontWeight.w600,
                               color: customRedColor),
@@ -358,23 +369,23 @@ class MessageDisplayWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        '${time_ago.format(snapshot.createdAt!)} - ',
+                        '${time_ago.format(widget.snapshot.createdAt!)} - ',
                         style: Theme.of(context)
                             .textTheme
-                            .bodyText2!
+                            .bodyMedium!
                             .copyWith(color: customGreyColor),
                       ),
                       Icon(
-                        (snapshot.like == null
+                        (widget.snapshot.like == null
                                 ? false
-                                : snapshot.like
-                                    .contains(_firebaseAuth.currentUser!.uid))
+                                : widget.snapshot.like.contains(
+                                    widget._firebaseAuth.currentUser!.uid))
                             ? Icons.thumb_up
                             : Feather.thumbs_up,
-                        color: (snapshot.like == null
+                        color: (widget.snapshot.like == null
                                 ? false
-                                : snapshot.like
-                                    .contains(_firebaseAuth.currentUser!.uid))
+                                : widget.snapshot.like.contains(
+                                    widget._firebaseAuth.currentUser!.uid))
                             ? customRedColor
                             : customGreyColor,
                         size: 20,
@@ -393,15 +404,15 @@ class MessageDisplayWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .bodyText2!
+                .bodyMedium!
                 .copyWith(fontWeight: FontWeight.w600, color: customGreyColor),
           ),
           const SizedBox(
             height: 25,
           ),
           StreamBuilder<comment.Comment?>(
-              stream: inboxManager
-                  .getInboxComments(inboxId: snapshot.id)
+              stream: widget.inboxManager
+                  .getInboxComments(inboxId: widget.snapshot.id!)
                   .asStream(),
               builder: (context, commentSnapshot) {
                 return ListView.separated(
@@ -428,9 +439,11 @@ class MessageDisplayWidget extends StatelessWidget {
                                     Random().nextInt(Colors.primaries.length)]
                                 .withOpacity(.2),
                             radius: 30,
-                            backgroundImage: (snapshot.user!.picture!.isEmpty
+                            backgroundImage: (widget
+                                        .snapshot.user!.picture!.isEmpty
                                     ? const ExactAssetImage('assets/avatar.png')
-                                    : NetworkImage(snapshot.user!.picture!))
+                                    : NetworkImage(
+                                        widget.snapshot.user!.picture!))
                                 as ImageProvider,
                           ),
                           const SizedBox(
@@ -442,12 +455,12 @@ class MessageDisplayWidget extends StatelessWidget {
                               SizedBox(
                                 width: MediaQuery.of(context).size.width - 120,
                                 child: ReadMoreText(
-                                  snapshot.message!,
+                                  widget.snapshot.message!,
                                   trimLines: 5,
                                   colorClickableText: customRedColor,
                                   lessStyle: Theme.of(context)
                                       .textTheme
-                                      .bodyText1!
+                                      .bodyLarge!
                                       .copyWith(
                                           fontWeight: FontWeight.w600,
                                           color: customRedColor),
@@ -456,11 +469,11 @@ class MessageDisplayWidget extends StatelessWidget {
                                   trimExpandedText: 'Show less',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .bodyText1!
+                                      .bodyLarge!
                                       .copyWith(fontWeight: FontWeight.normal),
                                   moreStyle: Theme.of(context)
                                       .textTheme
-                                      .bodyText1!
+                                      .bodyLarge!
                                       .copyWith(
                                           fontWeight: FontWeight.w600,
                                           color: customRedColor),
@@ -470,10 +483,10 @@ class MessageDisplayWidget extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${time_ago.format(snapshot.createdAt!)} - ',
+                                    '${time_ago.format(widget.snapshot.createdAt!)} - ',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyText2!
+                                        .bodyMedium!
                                         .copyWith(color: customGreyColor),
                                   )
                                 ],
@@ -497,7 +510,7 @@ class MessageDisplayWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: TextFormField(
             controller: _commentController,
-            style: Theme.of(context).textTheme.bodyText1,
+            style: Theme.of(context).textTheme.bodyLarge,
             textInputAction: TextInputAction.send,
             keyboardType: TextInputType.multiline,
             textCapitalization: TextCapitalization.words,
@@ -512,21 +525,26 @@ class MessageDisplayWidget extends StatelessWidget {
                           clickClose: false,
                           backButtonBehavior: BackButtonBehavior.ignore);
 
-                      bool isSent = await inboxManager.submitInboxComment(
-                          comment: _commentController.text,
-                          inboxId: snapshot.id);
+                      bool isSent = await widget.inboxManager
+                          .submitInboxComment(
+                              comment: _commentController.text,
+                              inboxId: widget.snapshot.id!);
                       BotToast.closeAllLoading();
+                      if (!context.mounted) return;
+
                       if (isSent) {
                         _commentController.clear();
                         uiUtilities.actionAlertWidget(
-                            context: context, alertType: 'success');
+                            context: context, alertType: AlertType.success);
                         uiUtilities.alertNotification(
-                            context: context, message: inboxManager.message!);
+                            context: context,
+                            message: widget.inboxManager.message!);
                       } else {
                         uiUtilities.actionAlertWidget(
-                            context: context, alertType: 'error');
+                            context: context, alertType: AlertType.error);
                         uiUtilities.alertNotification(
-                            context: context, message: inboxManager.message!);
+                            context: context,
+                            message: widget.inboxManager.message!);
                         debugPrint('$e');
                       }
                     },
@@ -536,7 +554,7 @@ class MessageDisplayWidget extends StatelessWidget {
                     )),
                 label: Text(
                   'Comment',
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 filled: false,
                 enabledBorder: OutlineInputBorder(
@@ -554,7 +572,7 @@ class MessageDisplayWidget extends StatelessWidget {
                 ),
                 hintStyle: Theme.of(context)
                     .textTheme
-                    .bodyText1!
+                    .bodyLarge!
                     .copyWith(color: Colors.grey)),
             validator: (value) {
               if (value!.isEmpty) {
@@ -581,7 +599,7 @@ class InboxItemWidget extends StatelessWidget {
   final VoidCallback onTap;
 
   const InboxItemWidget({
-    Key? key,
+    super.key,
     required this.teamName,
     required this.title,
     required this.description,
@@ -591,7 +609,7 @@ class InboxItemWidget extends StatelessWidget {
     required this.avatar,
     this.replies = 0,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -619,14 +637,14 @@ class InboxItemWidget extends StatelessWidget {
                       width: 8,
                     ),
                     Text(
-                      teamName!,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      teamName!.toCapitalize(),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
                 Text(
                   dueDate,
-                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: dueDate == 'Completed'
                           ? Colors.green
                           : customGreyColor),
@@ -673,7 +691,7 @@ class InboxItemWidget extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context)
                           .textTheme
-                          .bodyText1!
+                          .bodyLarge!
                           .copyWith(fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -691,7 +709,7 @@ class InboxItemWidget extends StatelessWidget {
                                 '$replies',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle2!
+                                    .titleSmall!
                                     .copyWith(
                                         fontWeight: FontWeight.normal,
                                         color: Colors.white),
@@ -738,7 +756,7 @@ class InboxItemWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context)
                             .textTheme
-                            .bodyText1!
+                            .bodyLarge!
                             .copyWith(fontWeight: FontWeight.normal),
                       ),
                     ),
@@ -749,7 +767,7 @@ class InboxItemWidget extends StatelessWidget {
                           '$timestamp - ',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyText2!
+                              .bodyMedium!
                               .copyWith(color: customGreyColor),
                         ),
                         Icon(

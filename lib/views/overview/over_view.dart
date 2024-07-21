@@ -16,7 +16,7 @@ import 'package:tasky_mobile_app/utils/ui_utils/ui_utils.dart';
 class OverView extends StatelessWidget {
   final ScrollController _scrollController = ScrollController();
 
-  OverView({Key? key}) : super(key: key);
+  OverView({super.key});
   final TaskManager _taskManager = GetIt.I.get<TaskManager>();
 
   @override
@@ -74,7 +74,7 @@ class OverView extends StatelessWidget {
                               'My Summary',
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyText1!
+                                  .bodyLarge!
                                   .copyWith(fontWeight: FontWeight.w600),
                             ),
                           )),
@@ -124,7 +124,7 @@ class OverView extends StatelessWidget {
                     'My Tasks',
                     style: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyLarge!
                         .copyWith(fontWeight: FontWeight.w600),
                   ),
                 )),
@@ -174,14 +174,14 @@ class OverView extends StatelessWidget {
                                       'Task:',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyText2!
+                                          .bodyMedium!
                                           .copyWith(
                                               fontWeight: FontWeight.w600),
                                     ),
                                     Text(
                                       snapshot.data!.data![index].description!,
                                       style:
-                                          Theme.of(context).textTheme.bodyText1,
+                                          Theme.of(context).textTheme.bodyLarge,
                                     ),
                                     const SizedBox(
                                       height: 15,
@@ -190,7 +190,7 @@ class OverView extends StatelessWidget {
                                       'Assignees:',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyText2!
+                                          .bodyMedium!
                                           .copyWith(
                                               fontWeight: FontWeight.w600),
                                     ),
@@ -252,7 +252,7 @@ class OverView extends StatelessWidget {
                               });
                         },
                         size: size,
-                        priority: camelize(
+                        priority: Strings.toCapitalised(
                             snapshot.data!.data![index].priorityLevel!),
                         time: UiUtilities().twenty4to12conventer(dateList[1]),
                         title: snapshot.data!.data![index].description,
@@ -268,13 +268,13 @@ class OverView extends StatelessWidget {
 
 class HomeTaskSummary extends StatelessWidget {
   const HomeTaskSummary({
-    Key? key,
+    super.key,
     required this.size,
     required this.title,
     required this.priority,
     required this.time,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   final Size size;
   final String? title;
@@ -331,7 +331,7 @@ class HomeTaskSummary extends StatelessWidget {
                           Text(
                             '$priority Priority',
                             style:
-                                Theme.of(context).textTheme.subtitle2!.copyWith(
+                                Theme.of(context).textTheme.titleSmall!.copyWith(
                                     color: priority == 'Low'
                                         ? Colors.green
                                         : priority == 'Medium'
@@ -354,7 +354,7 @@ class HomeTaskSummary extends StatelessWidget {
                                 time,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle2!
+                                    .titleSmall!
                                     .copyWith(
                                         color: customGreyColor,
                                         fontWeight: FontWeight.w600),
@@ -372,7 +372,7 @@ class HomeTaskSummary extends StatelessWidget {
                       child: Text(title!,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyText1),
+                          style: Theme.of(context).textTheme.bodyLarge),
                     ),
                   ],
                 )
@@ -387,13 +387,13 @@ class HomeTaskSummary extends StatelessWidget {
 
 class HomeTaskCountCard extends StatelessWidget {
   const HomeTaskCountCard({
-    Key? key,
+    super.key,
     required this.size,
     required this.desc,
     required this.count,
     required this.image,
     this.color,
-  }) : super(key: key);
+  });
 
   final Size size;
   final String desc;
@@ -437,14 +437,14 @@ class HomeTaskCountCard extends StatelessWidget {
                 children: [
                   Text(
                     desc,
-                    style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         fontWeight: FontWeight.normal, color: Colors.white),
                   ),
                   Text(
                     '$count',
                     style: Theme.of(context)
                         .textTheme
-                        .headline4!
+                        .headlineMedium!
                         .copyWith(fontWeight: FontWeight.bold, color: color),
                   ),
                 ],

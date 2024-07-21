@@ -11,10 +11,10 @@ class TaskAssigneeWidget extends StatefulWidget {
   final Member? data;
   final TaskManager taskManager;
   const TaskAssigneeWidget({
-    Key? key,
+    super.key,
     required this.data,
     required this.taskManager,
-  }) : super(key: key);
+  });
 
   @override
   State<TaskAssigneeWidget> createState() => _TaskAssigneeWidgetState();
@@ -82,7 +82,7 @@ class _TaskAssigneeWidgetState extends State<TaskAssigneeWidget> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text('Done',
-                  style: Theme.of(context).textTheme.button!.copyWith(color: Colors.white)),
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white)),
             ),
           ),
           const SizedBox(height: 15),

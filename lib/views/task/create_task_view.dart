@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get_it/get_it.dart';
-import 'package:groovin_widgets/groovin_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:tasky_mobile_app/managers/organization_manager.dart';
@@ -21,24 +20,28 @@ import 'package:tasky_mobile_app/utils/ui_utils/ui_utils.dart';
 import 'package:tasky_mobile_app/views/task/components/task_assignee_widget.dart';
 
 class CreateNewTaskView extends StatefulWidget {
-  const CreateNewTaskView({Key? key}) : super(key: key);
+  const CreateNewTaskView({super.key});
 
   @override
   State<CreateNewTaskView> createState() => _CreateNewTaskViewState();
 }
 
 class _CreateNewTaskViewState extends State<CreateNewTaskView> {
-  final OrganizationManager _organizationManager = GetIt.I.get<OrganizationManager>();
+  final OrganizationManager _organizationManager =
+      GetIt.I.get<OrganizationManager>();
   final TaskManager _taskManager = GetIt.I.get<TaskManager>();
   final UiUtilities uiUtilities = UiUtilities();
-  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FocusNode taskFocusNode = FocusNode();
+  final FocusNode reminderFocusNode = FocusNode();
   bool isSwitched = false;
-  final TextEditingController descriptionTextEditingController = TextEditingController();
-  final TextEditingController dueDateTextEditingController = TextEditingController();
+  final descriptionTextEditingController = TextEditingController();
+  final dueDateTextEditingController = TextEditingController();
+  final reminderTextEditingController = TextEditingController();
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
   late DateTime dueDate;
   String? teamTextEditingController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -49,10 +52,9 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvoked: (value) async {
         Navigator.pushReplacementNamed(context, '/', arguments: 1);
-        return true;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -60,13 +62,14 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
           iconTheme: const IconThemeData(color: Colors.white),
           leading: BackButton(
             color: Colors.white,
-            onPressed: () => Navigator.pushReplacementNamed(context, '/', arguments: 1),
+            onPressed: () =>
+                Navigator.pushReplacementNamed(context, '/', arguments: 1),
           ),
           title: Text(
             'New Task',
             style: Theme.of(context)
                 .textTheme
-                .headline6!
+                .titleLarge!
                 .copyWith(fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
@@ -77,7 +80,10 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
             children: [
               Text(
                 'What needs to be done ?',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 15,
@@ -85,7 +91,7 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
               TextFormField(
                 controller: descriptionTextEditingController,
                 focusNode: taskFocusNode,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.multiline,
                 textCapitalization: TextCapitalization.sentences,
@@ -95,12 +101,16 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                 decoration: InputDecoration(
                     filled: false,
                     hintText: 'Start Typing ...',
-                    enabledBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    focusedBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                    hintStyle: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.grey)),
+                    enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black)),
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: Colors.grey)),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Field cannot be Empty';
@@ -113,17 +123,18 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
               ),
               Text(
                 'By when ?',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 10,
               ),
               Text(
                 'Due date & time',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2!
-                    .copyWith(fontWeight: FontWeight.normal, color: customGreyColor),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.normal, color: customGreyColor),
               ),
               const SizedBox(
                 height: 10,
@@ -137,8 +148,10 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                     await pickDateTime(context);
                   },
                   controller: dueDateTextEditingController,
-                  style:
-                      Theme.of(context).textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(fontWeight: FontWeight.w600),
                   textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.datetime,
                   maxLines: 1,
@@ -150,10 +163,12 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                           borderSide: BorderSide(color: customGreyColor)),
                       focusedBorder: const UnderlineInputBorder(
                           borderSide: BorderSide(color: customGreyColor)),
-                      border:
-                          const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                      hintStyle:
-                          Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.grey),
+                      border: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                      hintStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: Colors.grey),
                       suffixIcon: const Icon(
                         Icons.arrow_forward,
                         color: customGreyColor,
@@ -171,7 +186,10 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
               ),
               Text(
                 'Which team?',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 10,
@@ -179,100 +197,145 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
               FutureBuilder<org.Organization?>(
                   future: _organizationManager.getOrganization(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                      return OutlineDropdownButton(
+                    if (snapshot.connectionState == ConnectionState.waiting &&
+                        !snapshot.hasData) {
+                      return DropdownButtonFormField<String>(
                         value: teamTextEditingController,
-                        inputDecoration: InputDecoration(
+                        decoration: InputDecoration(
                           alignLabelWithHint: true,
                           hintStyle: Theme.of(context)
                               .textTheme
-                              .bodyText2!
-                              .copyWith(fontWeight: FontWeight.normal, color: customGreyColor),
-                          contentPadding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
+                              .bodyMedium!
+                              .copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  color: customGreyColor),
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(15, 1, 15, 1),
                           floatingLabelBehavior: FloatingLabelBehavior.auto,
-                          focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                          enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                          disabledBorder: Theme.of(context).inputDecorationTheme.disabledBorder,
-                          errorBorder: Theme.of(context).inputDecorationTheme.errorBorder,
-                          focusedErrorBorder:
-                              Theme.of(context).inputDecorationTheme.focusedErrorBorder,
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          focusedBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .focusedBorder,
+                          enabledBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .enabledBorder,
+                          disabledBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .disabledBorder,
+                          errorBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .errorBorder,
+                          focusedErrorBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .focusedErrorBorder,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                           filled: true,
-                          labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-                          errorStyle: Theme.of(context).inputDecorationTheme.errorStyle,
+                          labelStyle:
+                              Theme.of(context).inputDecorationTheme.labelStyle,
+                          errorStyle:
+                              Theme.of(context).inputDecorationTheme.errorStyle,
                         ),
                         items: const [],
                         hint: Text(
                           'Select your team',
-                          style: Theme.of(context).textTheme.bodyText2,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         onChanged: (value) {},
                       );
                     }
 
-                    if (snapshot.connectionState == ConnectionState.done && snapshot.data == null) {
-                      return OutlineDropdownButton(
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.data == null) {
+                      return DropdownButtonFormField<String>(
                         value: teamTextEditingController,
-                        inputDecoration: InputDecoration(
+                        decoration: InputDecoration(
                           alignLabelWithHint: true,
                           hintStyle: Theme.of(context)
                               .textTheme
-                              .bodyText2!
-                              .copyWith(fontWeight: FontWeight.normal, color: customGreyColor),
-                          contentPadding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
+                              .bodyMedium!
+                              .copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  color: customGreyColor),
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(15, 1, 15, 1),
                           floatingLabelBehavior: FloatingLabelBehavior.auto,
-                          focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                          enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                          disabledBorder: Theme.of(context).inputDecorationTheme.disabledBorder,
-                          errorBorder: Theme.of(context).inputDecorationTheme.errorBorder,
-                          focusedErrorBorder:
-                              Theme.of(context).inputDecorationTheme.focusedErrorBorder,
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          focusedBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .focusedBorder,
+                          enabledBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .enabledBorder,
+                          disabledBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .disabledBorder,
+                          errorBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .errorBorder,
+                          focusedErrorBorder: Theme.of(context)
+                              .inputDecorationTheme
+                              .focusedErrorBorder,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                           filled: true,
-                          labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-                          errorStyle: Theme.of(context).inputDecorationTheme.errorStyle,
+                          labelStyle:
+                              Theme.of(context).inputDecorationTheme.labelStyle,
+                          errorStyle:
+                              Theme.of(context).inputDecorationTheme.errorStyle,
                         ),
                         items: const [],
                         hint: Text(
                           'Select your team',
-                          style: Theme.of(context).textTheme.bodyText2,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         onChanged: (value) {},
                       );
                     }
 
-                    return OutlineDropdownButton(
-                      inputDecoration: InputDecoration(
+                    return DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
                         alignLabelWithHint: true,
                         hintStyle: Theme.of(context)
                             .textTheme
-                            .bodyText2!
-                            .copyWith(fontWeight: FontWeight.normal, color: customGreyColor),
+                            .bodyMedium!
+                            .copyWith(
+                                fontWeight: FontWeight.normal,
+                                color: customGreyColor),
                         contentPadding: const EdgeInsets.fromLTRB(15, 1, 15, 1),
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        focusedBorder: Theme.of(context).inputDecorationTheme.focusedBorder,
-                        enabledBorder: Theme.of(context).inputDecorationTheme.enabledBorder,
-                        disabledBorder: Theme.of(context).inputDecorationTheme.disabledBorder,
-                        errorBorder: Theme.of(context).inputDecorationTheme.errorBorder,
-                        focusedErrorBorder:
-                            Theme.of(context).inputDecorationTheme.focusedErrorBorder,
-                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                        focusedBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .focusedBorder,
+                        enabledBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .enabledBorder,
+                        disabledBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .disabledBorder,
+                        errorBorder:
+                            Theme.of(context).inputDecorationTheme.errorBorder,
+                        focusedErrorBorder: Theme.of(context)
+                            .inputDecorationTheme
+                            .focusedErrorBorder,
+                        fillColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
                         filled: true,
-                        labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-                        errorStyle: Theme.of(context).inputDecorationTheme.errorStyle,
+                        labelStyle:
+                            Theme.of(context).inputDecorationTheme.labelStyle,
+                        errorStyle:
+                            Theme.of(context).inputDecorationTheme.errorStyle,
                       ),
                       items: snapshot.data!.data!.teams!
                           .map((value) => DropdownMenuItem<String>(
                               value: value,
                               child: Text(
                                 value,
-                                style: Theme.of(context).textTheme.bodyText1,
+                                style: Theme.of(context).textTheme.bodyLarge,
                               )))
                           .toList(),
                       value: teamTextEditingController,
                       hint: Text(
                         'Select your team',
-                        style: Theme.of(context).textTheme.bodyText2,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -298,7 +361,7 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                     'Set task reminder',
                     style: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyLarge!
                         .copyWith(fontWeight: FontWeight.w600),
                   ),
                   Switch.adaptive(
@@ -315,6 +378,84 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                   )
                 ],
               ),
+              Visibility(
+                visible: isSwitched,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      'Notify Before',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.normal,
+                          color: customGreyColor),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    TextFormField(
+                      controller: reminderTextEditingController,
+                      focusNode: reminderFocusNode,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textInputAction: TextInputAction.done,
+                      keyboardType: TextInputType.number,
+                      textCapitalization: TextCapitalization.none,
+                      maxLines: 1,
+                      cursorColor:
+                          Theme.of(context).textSelectionTheme.cursorColor,
+                      enableInteractiveSelection: true,
+                      decoration: InputDecoration(
+                          filled: false,
+                          hintText: '15',
+                          suffixIcon: CupertinoSlidingSegmentedControl<int>(
+                            backgroundColor: Colors.grey.withOpacity(.2),
+                            groupValue: _currentIndex,
+                            children: {
+                              0: Text('Min',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12)),
+                              1: Text('Hr',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12)),
+                            },
+                            onValueChanged: (value) {
+                              setState(() {
+                                _currentIndex = value ?? 0;
+                              });
+                            },
+                            thumbColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: customGreyColor)),
+                          focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: customGreyColor)),
+                          border: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black)),
+                          hintStyle: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(color: Colors.grey)),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Field cannot be Empty';
+                        }
+                        return null;
+                      },
+                    )
+                  ],
+                ),
+              ),
               const SizedBox(
                 height: 15,
               ),
@@ -324,17 +465,18 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
               ),
               Text(
                 'By whom ?',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 10,
               ),
               Text(
                 'select Assignee',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2!
-                    .copyWith(fontWeight: FontWeight.normal, color: customGreyColor),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.normal, color: customGreyColor),
               ),
               const SizedBox(
                 height: 15,
@@ -345,16 +487,19 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                       ? Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: FlutterImageStack(
-                            imageList: _taskManager.assignees.map((e) => e.picture).toList()
-                                as List<String>,
-                            extraCountTextStyle: Theme.of(context).textTheme.subtitle2!,
-                            itemBorderColor: Theme.of(context).scaffoldBackgroundColor,
+                            imageList: _taskManager.assignees
+                                .map((e) => e.picture ?? defaultAvatarUrl)
+                                .toList() as dynamic,
+                            extraCountTextStyle:
+                                Theme.of(context).textTheme.titleSmall!,
+                            itemBorderColor:
+                                Theme.of(context).scaffoldBackgroundColor,
                             itemRadius: 50,
                             itemCount: _taskManager.assignees.length,
                             itemBorderWidth: 1,
                             showTotalCount: true,
-                            backgroundColor: Colors
-                                .primaries[Random().nextInt(Colors.primaries.length)]
+                            backgroundColor: Colors.primaries[
+                                    Random().nextInt(Colors.primaries.length)]
                                 .withOpacity(.5),
                             totalCount: _taskManager.assignees.length - 1,
                           ),
@@ -363,11 +508,13 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                   FutureBuilder<Member?>(
                       future: _organizationManager.getOrganizationMembers(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting &&
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting &&
                             !snapshot.hasData) {
                           return const CupertinoActivityIndicator();
                         }
-                        if (snapshot.connectionState == ConnectionState.done && !snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            !snapshot.hasData) {
                           return Align(
                             alignment: Alignment.centerLeft,
                             child: DottedBorder(
@@ -376,7 +523,8 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                               color: customGreyColor,
                               dashPattern: const [6, 3, 6, 3],
                               child: ClipRRect(
-                                borderRadius: const BorderRadius.all(Radius.circular(45)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(45)),
                                 child: Container(
                                   height: 45,
                                   width: 45,
@@ -424,7 +572,8 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                               color: customGreyColor,
                               dashPattern: const [6, 3, 6, 3],
                               child: ClipRRect(
-                                borderRadius: const BorderRadius.all(Radius.circular(45)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(45)),
                                 child: Container(
                                   height: 45,
                                   width: 45,
@@ -468,21 +617,27 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                       assignees: userIds,
                     );
                     BotToast.closeAllLoading();
+                    if (!context.mounted) return;
+
                     if (isSaved) {
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'success');
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.success);
                       uiUtilities.alertNotification(
                           context: context, message: _taskManager.message!);
 
                       Future.delayed(const Duration(seconds: 3), () {
-                        Navigator.pushReplacementNamed(context, '/', arguments: 1);
+                        Navigator.pushReplacementNamed(context, '/',
+                            arguments: 1);
                       });
                     } else {
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'error');
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.error);
                       uiUtilities.alertNotification(
                           context: context, message: _taskManager.message!);
                     }
                   } else {
-                    uiUtilities.actionAlertWidget(context: context, alertType: 'error');
+                    uiUtilities.actionAlertWidget(
+                        context: context, alertType: AlertType.error);
                     uiUtilities.alertNotification(
                         context: context, message: 'Fields cannot be empty');
                   }
@@ -490,7 +645,10 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text('Create Task',
-                      style: Theme.of(context).textTheme.button!.copyWith(color: Colors.white)),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 15),
@@ -514,7 +672,8 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
                 onDateTimeChanged: (picked) {
                   setState(() {
                     dueDate = picked;
-                    dueDateTextEditingController.text = dateFormat.format(dueDate);
+                    dueDateTextEditingController.text =
+                        dateFormat.format(dueDate);
                   });
                 },
                 initialDateTime: DateTime.now(),
@@ -531,6 +690,8 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
         lastDate: DateTime(2030),
         helpText: 'Select due date',
       );
+      if (!context.mounted) return;
+
       if (picked != null) {
         TimeOfDay? timeOfDay = await showTimePicker(
           context: context,
@@ -540,8 +701,8 @@ class _CreateNewTaskViewState extends State<CreateNewTaskView> {
 
         if (timeOfDay != null) {
           setState(() {
-            dueDate =
-                DateTime(picked.year, picked.month, picked.day, timeOfDay.hour, timeOfDay.minute);
+            dueDate = DateTime(picked.year, picked.month, picked.day,
+                timeOfDay.hour, timeOfDay.minute);
             dueDateTextEditingController.text = dateFormat.format(dueDate);
           });
         }

@@ -10,10 +10,13 @@ import 'package:image_picker/image_picker.dart' as image_picker;
 
 import 'custom_colors.dart';
 
+const defaultAvatarUrl = 'https://asset.cloudinary.com/iametornam/6ccefc294e57bc7f90054f08f5e4fe0f';
+
+enum AlertType { error , info, success }
+
 class UiUtilities {
-  actionAlertWidget({required BuildContext context, required String alertType}) {
-    YYDialog yyDialog = YYDialog();
-    yyDialog.build(context)
+  actionAlertWidget({required BuildContext context, required AlertType alertType}) {
+    final yyDialog = YYDialog()..build(context)
       ..width = 120
       ..height = 110
       ..backgroundColor = Colors.black.withOpacity(0.8)
@@ -22,9 +25,9 @@ class UiUtilities {
       ..widget(Padding(
         padding: const EdgeInsets.only(top: 21),
         child: SvgPicture.asset(
-          alertType == 'error'
+          alertType == AlertType.error
               ? 'assets/error.svg'
-              : alertType == 'info'
+              : alertType == AlertType.info
                   ? 'assets/info.svg'
                   : 'assets/success.svg',
           width: 38,
@@ -34,9 +37,9 @@ class UiUtilities {
       ..widget(Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Text(
-          alertType == 'error'
+          alertType.name == 'error'
               ? 'Failed'
-              : alertType == 'info'
+              : alertType.name == 'info'
                   ? 'Info'
                   : 'Success',
           style: const TextStyle(
@@ -60,8 +63,8 @@ class UiUtilities {
   alertNotification({required String message, required BuildContext context}) {
     return BotToast.showSimpleNotification(
         title: message,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.3),
-        borderRadius: 10,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(.1),
+        borderRadius: 10.0,
         duration: const Duration(seconds: 4),
         align: Alignment.topCenter);
   }

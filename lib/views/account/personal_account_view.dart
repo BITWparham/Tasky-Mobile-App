@@ -13,7 +13,7 @@ import 'package:tasky_mobile_app/utils/ui_utils/custom_colors.dart';
 import 'package:tasky_mobile_app/utils/ui_utils/ui_utils.dart';
 
 class PersonalAccountView extends StatefulWidget {
-  const PersonalAccountView({Key? key}) : super(key: key);
+  const PersonalAccountView({super.key});
 
   @override
   State<PersonalAccountView> createState() => _PersonalAccountViewState();
@@ -35,7 +35,9 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
   String? profileUrl;
 
   getProfileFromCamera() async {
-    await uiUtilities.getImage(imageSource: ImageSource.camera).then((file) async {
+    await uiUtilities
+        .getImage(imageSource: ImageSource.camera)
+        .then((file) async {
       File? croppedFile = await uiUtilities.getCroppedFile(file: file!.path);
 
       if (croppedFile != null) {
@@ -47,7 +49,9 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
   }
 
   getProfileFromGallery() async {
-    await uiUtilities.getImage(imageSource: ImageSource.gallery).then((file) async {
+    await uiUtilities
+        .getImage(imageSource: ImageSource.gallery)
+        .then((file) async {
       File? croppedFile = await uiUtilities.getCroppedFile(file: file!.path);
 
       if (croppedFile != null) {
@@ -91,7 +95,10 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
       appBar: AppBar(
         title: Text(
           'Update Profile',
-          style: Theme.of(context).textTheme.headline6!.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -102,8 +109,9 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
             children: [
               Center(
                 child: CircleAvatar(
-                  backgroundColor:
-                      Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(.2),
+                  backgroundColor: Colors
+                      .primaries[Random().nextInt(Colors.primaries.length)]
+                      .withOpacity(.2),
                   radius: 60,
                   backgroundImage: (profileUrl == null
                       ? (_imageFile == null
@@ -119,10 +127,8 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                   child: TextButton(
                 child: Text(
                   'update profile photo',
-                  style: Theme.of(context)
-                      .textTheme
-                      .subtitle2!
-                      .copyWith(fontWeight: FontWeight.w600, color: customRedColor),
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      fontWeight: FontWeight.w600, color: customRedColor),
                 ),
                 onPressed: () {
                   Platform.isIOS
@@ -149,7 +155,7 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
               TextFormField(
                 controller: nameTextEditingController,
                 focusNode: nameFocusNode,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.words,
@@ -159,12 +165,16 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                 decoration: InputDecoration(
                     filled: false,
                     hintText: 'Your Full name',
-                    enabledBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    focusedBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                    hintStyle: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.grey)),
+                    enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black)),
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: Colors.grey)),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Organization Name cannot be Empty';
@@ -178,7 +188,7 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
               TextFormField(
                 controller: emailTextEditingController,
                 focusNode: emailFocusNode,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
                 textCapitalization: TextCapitalization.none,
@@ -188,12 +198,16 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                 decoration: InputDecoration(
                     filled: false,
                     hintText: 'Your Email address',
-                    enabledBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    focusedBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                    hintStyle: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.grey)),
+                    enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black)),
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: Colors.grey)),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Organization Name cannot be Empty';
@@ -207,7 +221,7 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
               TextFormField(
                 controller: phoneTextEditingController,
                 focusNode: phoneFocusNode,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.phone,
                 textCapitalization: TextCapitalization.none,
@@ -217,12 +231,16 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                 decoration: InputDecoration(
                     filled: false,
                     hintText: 'Your Phone number',
-                    enabledBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    focusedBorder:
-                        const UnderlineInputBorder(borderSide: BorderSide(color: customGreyColor)),
-                    border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                    hintStyle: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.grey)),
+                    enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: customGreyColor)),
+                    border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black)),
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: Colors.grey)),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Organization Name cannot be Empty';
@@ -245,14 +263,19 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                         name: nameTextEditingController.text,
                         phone: phoneTextEditingController.text);
                     BotToast.closeAllLoading();
-                    uiUtilities.alertNotification(context: context, message: _userManager.message!);
+                    if (!context.mounted) return;
+                    uiUtilities.alertNotification(
+                        context: context, message: _userManager.message!);
                     if (isUpdated) {
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'success');
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.success);
                     } else {
-                      uiUtilities.actionAlertWidget(context: context, alertType: 'error');
+                      uiUtilities.actionAlertWidget(
+                          context: context, alertType: AlertType.error);
                     }
                   } else {
-                    uiUtilities.actionAlertWidget(context: context, alertType: 'error');
+                    uiUtilities.actionAlertWidget(
+                        context: context, alertType: AlertType.error);
                     uiUtilities.alertNotification(
                         context: context, message: 'Fields cannot be Empty!');
                   }
@@ -264,7 +287,10 @@ class _PersonalAccountViewState extends State<PersonalAccountView> {
                     )),
                 child: Text(
                   'Update Profile',
-                  style: Theme.of(context).textTheme.button!.copyWith(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelLarge!
+                      .copyWith(color: Colors.white),
                 ),
               )
             ],
